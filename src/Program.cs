@@ -8,7 +8,7 @@ using Microsoft.Azure.Cosmos;
 
 // <client_credentials> New instance of CosmosClient class
 using CosmosClient client = new(
-    accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!, 
+    accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!,
     authKeyOrResourceToken: Environment.GetEnvironmentVariable("COSMOS_KEY")!
 );
 // </client_credentials>
