@@ -2,13 +2,11 @@
 using Microsoft.Azure.Cosmos;
 // </using>
 
-// <credentials> Account endpoint and key credentials
-string endpoint = Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!;
-string key = Environment.GetEnvironmentVariable("COSMOS_KEY")!;
-// </credentials>
-
 // <client> New instance of CosmosClient class
-using CosmosClient client = new(endpoint, key);
+using CosmosClient client = new(
+    accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!, 
+    authKeyOrResourceToken: Environment.GetEnvironmentVariable("COSMOS_KEY")!
+);
 // </client>
 
 // <new-database> Database reference with creation if it does not already exist
