@@ -1,23 +1,27 @@
-﻿// <using> Using blocks
-using Microsoft.Azure.Cosmos;
-// </using>
+﻿// ------------------------------------------------------------
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// ------------------------------------------------------------
 
-// <client> New instance of CosmosClient class
+// <Using> Using blocks
+using Microsoft.Azure.Cosmos;
+// </Using>
+
+// <Client> New instance of CosmosClient class
 using CosmosClient client = new(
     accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!, 
     authKeyOrResourceToken: Environment.GetEnvironmentVariable("COSMOS_KEY")!
 );
-// </client>
+// </Client>
 
-// <new-database> Database reference with creation if it does not already exist
+// <NewDatabase> Database reference with creation if it does not already exist
 Database database = await client.CreateDatabaseIfNotExistsAsync(
     id: "tododatabase"
 );
 
 Console.WriteLine($"New database:\t{database.Id}");
-// </new-database>
+// </NewDatabase>
 
-// <new-container> Container reference with creation if it does not alredy exist
+// <NewContainer> Container reference with creation if it does not alredy exist
 Container container = await database.CreateContainerIfNotExistsAsync(
     id: "taskscontainer",
     partitionKeyPath: "/partitionKey",
@@ -25,9 +29,9 @@ Container container = await database.CreateContainerIfNotExistsAsync(
 );
 
 Console.WriteLine($"New container:\t{container.Id}");
-// </new-container>
+// </NewContainer>
 
-// <new-item> Create new object and upsert (create or replace) to container
+// <NewItem> Create new object and upsert (create or replace) to container
 TodoItem newItem = new(
     id: "fb59918b-fb3d-4549-9503-38bee83a6e1d",
     partitionKey: "personal-tasks-user-88033a55",
@@ -42,9 +46,9 @@ TodoItem createdItem = await container.UpsertItemAsync<TodoItem>(
 );
 
 Console.WriteLine($"Created item:\t{createdItem.id}\t[{createdItem.partitionKey}]");
-// </new-item>
+// </NewItem>
 
-// <query> Create query using a SQL string and parameters
+// <Query> Create query using a SQL string and parameters
 var query = new QueryDefinition(
     query: "SELECT * FROM todo t WHERE t.partitionKey = @key"
 )
@@ -62,4 +66,4 @@ while (feed.HasMoreResults)
         Console.WriteLine($"Found item:\t{createdItem.description}");
     }
 }
-// </query>
+// </Query>
