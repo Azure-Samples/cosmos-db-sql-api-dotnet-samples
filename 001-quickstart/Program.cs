@@ -52,6 +52,14 @@ TodoItem createdItem = await container.UpsertItemAsync<TodoItem>(
 Console.WriteLine($"Created item:\t{createdItem.id}\t[{createdItem.partitionKey}]");
 // </new_item>
 
+// <read_item> 
+// Point read item from container using the id and partitionKey
+TodoItem readItem = await container.ReadItemAsync<TodoItem>(
+    id: "fb59918b-fb3d-4549-9503-38bee83a6e1d",
+    partitionKey: new PartitionKey("personal-tasks-user-88033a55")
+);
+// </read_item>
+
 // <query_items> 
 // Create query using a SQL string and parameters
 var query = new QueryDefinition(
@@ -68,7 +76,7 @@ while (feed.HasMoreResults)
     FeedResponse<TodoItem> response = await feed.ReadNextAsync();
     foreach (TodoItem item in response)
     {
-        Console.WriteLine($"Found item:\t{createdItem.description}");
+        Console.WriteLine($"Found item:\t{item.description}");
     }
 }
 // </query_items>
