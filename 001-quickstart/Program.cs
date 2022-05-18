@@ -17,7 +17,7 @@ using CosmosClient client = new(
 // <new_database> 
 // Database reference with creation if it does not already exist
 Database database = await client.CreateDatabaseIfNotExistsAsync(
-    id: "tododatabase"
+    id: "adventureworks"
 );
 
 Console.WriteLine($"New database:\t{database.Id}");
@@ -26,8 +26,8 @@ Console.WriteLine($"New database:\t{database.Id}");
 // <new_container> 
 // Container reference with creation if it does not alredy exist
 Container container = await database.CreateContainerIfNotExistsAsync(
-    id: "taskscontainer",
-    partitionKeyPath: "/partitionKey",
+    id: "products",
+    partitionKeyPath: "/category",
     throughput: 400
 );
 
@@ -36,27 +36,27 @@ Console.WriteLine($"New container:\t{container.Id}");
 
 // <new_item> 
 // Create new object and upsert (create or replace) to container
-TodoItem newItem = new(
-    id: "fb59918b-fb3d-4549-9503-38bee83a6e1d",
-    partitionKey: "personal-tasks-user-88033a55",
-    description: "Dispose of household trash",
-    done: false,
-    priority: 2
+Product newItem = new(
+    id: "68719518391",
+    category: "gear-surf-surfboards",
+    name: "Yamba Surfboard",
+    quantity: 12,
+    sale: false
 );
 
-TodoItem createdItem = await container.UpsertItemAsync<TodoItem>(
+Product createdItem = await container.UpsertItemAsync<Product>(
     item: newItem,
-    partitionKey: new PartitionKey("personal-tasks-user-88033a55")
+    partitionKey: new PartitionKey("gear-surf-surfboards")
 );
 
-Console.WriteLine($"Created item:\t{createdItem.id}\t[{createdItem.partitionKey}]");
+Console.WriteLine($"Created item:\t{createdItem.id}\t[{createdItem.category}]");
 // </new_item>
 
 // <read_item> 
 // Point read item from container using the id and partitionKey
-TodoItem readItem = await container.ReadItemAsync<TodoItem>(
-    id: "fb59918b-fb3d-4549-9503-38bee83a6e1d",
-    partitionKey: new PartitionKey("personal-tasks-user-88033a55")
+Product readItem = await container.ReadItemAsync<Product>(
+    id: "68719518391",
+    partitionKey: new PartitionKey("gear-surf-surfboards")
 );
 // </read_item>
 
@@ -65,18 +65,18 @@ TodoItem readItem = await container.ReadItemAsync<TodoItem>(
 var query = new QueryDefinition(
     query: "SELECT * FROM todo t WHERE t.partitionKey = @key"
 )
-    .WithParameter("@key", "personal-tasks-user-88033a55");
+    .WithParameter("@key", "gear-surf-surfboards");
 
-using FeedIterator<TodoItem> feed = container.GetItemQueryIterator<TodoItem>(
+using FeedIterator<Product> feed = container.GetItemQueryIterator<Product>(
     queryDefinition: query
 );
 
 while (feed.HasMoreResults)
 {
-    FeedResponse<TodoItem> response = await feed.ReadNextAsync();
-    foreach (TodoItem item in response)
+    FeedResponse<Product> response = await feed.ReadNextAsync();
+    foreach (Product item in response)
     {
-        Console.WriteLine($"Found item:\t{item.description}");
+        Console.WriteLine($"Found item:\t{item.name}");
     }
 }
 // </query_items>
