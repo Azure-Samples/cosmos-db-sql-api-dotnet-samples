@@ -5,9 +5,12 @@ jobs:
     name: Validate .NET project
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:6.0
+    strategy:
+      matrix:
+        project-directory: [./001-quickstart, ./101-client-endpoint-key, ./102-client-connection-string]
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ${{ matrix.project-directory }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3       
