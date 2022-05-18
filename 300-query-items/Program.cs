@@ -6,62 +6,61 @@
 using Microsoft.Azure.Cosmos;
 // </using_directives>
 
-// <client_credentials> 
-// New instance of CosmosClient class
+// <endpoint_key> 
+// New instance of CosmosClient class using an endpoint and key string
 using CosmosClient client = new(
     accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!,
     authKeyOrResourceToken: Environment.GetEnvironmentVariable("COSMOS_KEY")!
 );
-// </client_credentials>
+// </endpoint_key>
 
-// <new_database> 
-// Database reference with creation if it does not already exist
+// <create_database>
+// New instance of Database class referencing the server-side database
 Database database = await client.CreateDatabaseIfNotExistsAsync(
     id: "adventureworks"
 );
+// </create_database>
 
-Console.WriteLine($"New database:\t{database.Id}");
-// </new_database>
-
-// <new_container> 
-// Container reference with creation if it does not alredy exist
+// <create_container>
+// New instance of Container class referencing the server-side container
 Container container = await database.CreateContainerIfNotExistsAsync(
     id: "products",
     partitionKeyPath: "/category",
     throughput: 400
 );
+// </create_container>
 
-Console.WriteLine($"New container:\t{container.Id}");
-// </new_container>
-
-// <new_item> 
-// Create new object and upsert (create or replace) to container
-Product newItem = new(
-    id: "68719518391",
+// <create_items> 
+// Create new items and add to container
+Product firstNewItem = new(
+    id: "68719518388",
     category: "gear-surf-surfboards",
-    name: "Yamba Surfboard",
-    quantity: 12,
+    name: "Sunnox Surfboard",
+    quantity: 8,
+    sale: true
+);
+
+Product secondNewitem = new(
+    id: "68719518398",
+    category: "gear-surf-surfboards",
+    name: "Noosa Surfboard",
+    quantity: 15,
     sale: false
 );
 
-Product createdItem = await container.UpsertItemAsync<Product>(
-    item: newItem,
+await container.CreateItemAsync<Product>(
+    item: firstNewItem,
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
 
-Console.WriteLine($"Created item:\t{createdItem.id}\t[{createdItem.category}]");
-// </new_item>
-
-// <read_item> 
-// Point read item from container using the id and partitionKey
-Product readItem = await container.ReadItemAsync<Product>(
-    id: "68719518391",
+await container.CreateItemAsync<Product>(
+    item: secondNewitem,
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
-// </read_item>
+// </create_items> 
 
-// <query_items> 
-// Create query using a SQL string and parameters
+// <query_items>
+// Query multiple items from container
 var query = new QueryDefinition(
     query: "SELECT * FROM products p WHERE p.partitionKey = @key"
 )

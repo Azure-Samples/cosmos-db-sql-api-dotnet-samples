@@ -13,6 +13,11 @@ jobs:
           - ./102-client-connection-string
           - ./103-client-default-credential
           - ./104-client-secret-credential
+          - ./200-create-database
+          - ./225-create-container
+          - ./250-create-item
+          - ./275-read-item
+          - ./300-query-items
     defaults:
       run:
         working-directory: ${{ matrix.project-directory }}
