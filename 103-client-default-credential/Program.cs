@@ -3,12 +3,20 @@
 // ------------------------------------------------------------
 
 // <using_directives> 
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 // </using_directives>
 
-// <connection_string> 
+// <credential>
+// Credential class for testing on a local machine or Azure services
+TokenCredential credential = new DefaultAzureCredential();
+// </credential>
+
+// <default_credential> 
 // New instance of CosmosClient class using a connection string
 using CosmosClient client = new(
-    connectionString: Environment.GetEnvironmentVariable("COSMOS_CONNECTION_STRING")!
+    accountEndpoint: Environment.GetEnvironmentVariable("COSMOS_ENDPOINT")!,
+    tokenCredential: credential
 );
-// </connection_string>
+// </default_credential>
