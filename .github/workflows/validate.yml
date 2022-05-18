@@ -7,7 +7,12 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:6.0
     strategy:
       matrix:
-        project-directory: [./001-quickstart, ./101-client-endpoint-key, ./102-client-connection-string]
+        project-directory:
+          - ./001-quickstart
+          - ./101-client-endpoint-key
+          - ./102-client-connection-string
+          - ./103-client-default-credential
+          - ./104-client-secret-credential
     defaults:
       run:
         working-directory: ${{ matrix.project-directory }}
