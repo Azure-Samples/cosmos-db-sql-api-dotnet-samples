@@ -30,9 +30,9 @@ Container container = await database.CreateContainerIfNotExistsAsync(
 );
 // </create_container>
 
-// <create_item> 
+// <create_objects> 
 // Create new item and add to container
-Product newItem = new(
+Product firstItem = new(
     id: "68719518388",
     category: "gear-surf-surfboards",
     name: "Sunnox Surfboard",
@@ -40,11 +40,26 @@ Product newItem = new(
     sale: true
 );
 
-Product createdItem = await container.CreateItemAsync<Product>(
-    item: newItem,
+Product secondItem = new(
+    id: "68719518381",
+    category: "gear-surf-surfboards",
+    name: "Kalbar Surfboard",
+    quantity: 4,
+    sale: false
+);
+// </create_objects>
+
+// <create_items>
+await container.CreateItemAsync<Product>(
+    item: firstItem,
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
-// </create_item> 
+
+await container.CreateItemAsync<Product>(
+    item: secondItem,
+    partitionKey: new PartitionKey("gear-surf-surfboards")
+);
+// </create_items> 
 
 // <read_item>
 // Read existing item from container
@@ -53,3 +68,39 @@ Product readItem = await container.ReadItemAsync<Product>(
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
 // </read_item>
+
+// <read_item_stream>
+// Read existing item from container
+using ResponseMessage readItemStreamResponse = await container.ReadItemStreamAsync(
+    id: "68719518388",
+    partitionKey: new PartitionKey("gear-surf-surfboards")
+);
+
+// Get stream from response
+using StreamReader readItemStreamReader = new(readItemStreamResponse.Content);
+
+// (optional) Get stream content
+string content = await readItemStreamReader.ReadToEndAsync();
+// </read_item_stream>
+
+// <read_multiple_items>
+// Create partition key object
+PartitionKey partitionKey = new("gear-surf-surfboards");
+
+// Create list of tuples for each item
+List<(string, PartitionKey)> itemsToFind = new()
+{
+    ("68719518388", partitionKey),
+    ("68719518381", partitionKey)
+};
+
+// Read multiple items
+FeedResponse<Product> response = await container.ReadManyItemsAsync<Product>(
+    items: itemsToFind
+);
+
+foreach (Product item in response)
+{
+    Console.WriteLine($"Found item:\t{item.name}");
+}
+// </read_multiple_items>
