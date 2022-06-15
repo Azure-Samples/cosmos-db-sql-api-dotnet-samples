@@ -59,7 +59,7 @@ await container.CreateItemAsync<Product>(
 );
 // </create_items> 
 
-// <query_items>
+// <query_items_sql>
 // Query multiple items from container
 var query = new QueryDefinition(
     query: "SELECT * FROM products p WHERE p.partitionKey = @key"
@@ -78,4 +78,21 @@ while (feed.HasMoreResults)
         Console.WriteLine($"Found item:\t{item.name}");
     }
 }
-// </query_items>
+// </query_items_sql>
+
+// <query_items_linq>
+// Get LINQ IQueryable object
+IOrderedQueryable<Product> queryable = container.GetItemLinqQueryable<Product>();
+
+// Construct LINQ query
+var matches = queryable
+    .Where(p => p.category == "gear-surf-surfboards")
+    .Where(p => p.sale == false)
+    .Where(p => p.quantity > 10);
+
+// Iterate over query results
+foreach(Product item in matches)
+{
+    Console.WriteLine($"Matched item:\t{item.name}");
+}
+// </query_items_linq>
