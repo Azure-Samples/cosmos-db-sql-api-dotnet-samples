@@ -30,18 +30,35 @@ Container container = await database.CreateContainerIfNotExistsAsync(
 );
 // </create_container>
 
-// <create_item> 
+// <create_object> 
 // Create new item and add to container
-Product newItem = new(
+Product item = new(
     id: "68719518388",
     category: "gear-surf-surfboards",
     name: "Sunnox Surfboard",
     quantity: 8,
     sale: true
 );
+// </create_object> 
 
+// <create_item> 
 Product createdItem = await container.CreateItemAsync<Product>(
-    item: newItem,
+    item: item,
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
 // </create_item> 
+
+// <replace_item>
+Product replacedItem = await container.ReplaceItemAsync<Product>(
+    item: item,
+    id: "68719518388",
+    partitionKey: new PartitionKey("gear-surf-surfboards")
+);
+// </replace_item>
+
+// <upsert_item>
+Product upsertedItem = await container.UpsertItemAsync<Product>(
+    item: item,
+    partitionKey: new PartitionKey("gear-surf-surfboards")
+);
+// </upsert_item>
