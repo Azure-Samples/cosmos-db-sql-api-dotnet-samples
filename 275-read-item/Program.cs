@@ -3,6 +3,7 @@
 // ------------------------------------------------------------
 
 // <using_directives> 
+using System.Net;
 using Microsoft.Azure.Cosmos;
 // </using_directives>
 
@@ -67,7 +68,23 @@ Product readItem = await container.ReadItemAsync<Product>(
     id: "68719518388",
     partitionKey: new PartitionKey("gear-surf-surfboards")
 );
-// </read_item>
+// </read_item> 
+
+// <read_item_expanded>
+// Read existing item from container
+ItemResponse<Product> readResponse = await container.ReadItemAsync<Product>(
+    id: "68719518388",
+    partitionKey: new PartitionKey("gear-surf-surfboards")
+);
+
+// Get response metadata
+double requestUnits = readResponse.RequestCharge;
+HttpStatusCode statusCode = readResponse.StatusCode;
+
+// Explicitly get item
+Product readItemExplicit = readResponse.Resource;
+// </read_item_expanded>
+
 
 // <read_item_stream>
 // Read existing item from container
@@ -95,11 +112,11 @@ List<(string, PartitionKey)> itemsToFind = new()
 };
 
 // Read multiple items
-FeedResponse<Product> response = await container.ReadManyItemsAsync<Product>(
+FeedResponse<Product> feedResponse = await container.ReadManyItemsAsync<Product>(
     items: itemsToFind
 );
 
-foreach (Product item in response)
+foreach (Product item in feedResponse)
 {
     Console.WriteLine($"Found item:\t{item.name}");
 }

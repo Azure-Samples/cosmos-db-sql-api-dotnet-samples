@@ -91,7 +91,7 @@ var matches = queryable
     .Where(p => p.quantity > 10);
 
 // Iterate over query results
-foreach(Product item in matches)
+foreach (Product item in matches)
 {
     Console.WriteLine($"Matched item:\t{item.name}");
 }
