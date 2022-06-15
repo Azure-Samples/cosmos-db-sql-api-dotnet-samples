@@ -4,6 +4,7 @@
 
 // <using_directives> 
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
 // </using_directives>
 
 // <endpoint_key> 
@@ -61,24 +62,47 @@ await container.CreateItemAsync<Product>(
 
 // <query_items_sql>
 // Query multiple items from container
-var query = new QueryDefinition(
-    query: "SELECT * FROM products p WHERE p.partitionKey = @key"
-)
-    .WithParameter("@key", "gear-surf-surfboards");
-
 using FeedIterator<Product> feed = container.GetItemQueryIterator<Product>(
-    queryDefinition: query
+    queryText: "SELECT * FROM products"
 );
 
+// Iterate query result pages
 while (feed.HasMoreResults)
 {
     FeedResponse<Product> response = await feed.ReadNextAsync();
+
+    // Iterate query results
     foreach (Product item in response)
     {
         Console.WriteLine($"Found item:\t{item.name}");
     }
 }
 // </query_items_sql>
+
+// <query_items_sql_parameters>
+// Build query definition
+var parameterizedQuery = new QueryDefinition(
+    query: "SELECT * FROM products p WHERE p.category = @partitionKey"
+)
+    .WithParameter("@partitionKey", "gear-surf-surfboards");
+
+// Query multiple items from container
+using FeedIterator<Product> filteredFeed = container.GetItemQueryIterator<Product>(
+    queryDefinition: parameterizedQuery
+);
+
+// Iterate query result pages
+while (filteredFeed.HasMoreResults)
+{
+    FeedResponse<Product> response = await filteredFeed.ReadNextAsync();
+
+    // Iterate query results
+    foreach (Product item in response)
+    {
+        Console.WriteLine($"Found item:\t{item.name}");
+    }
+}
+// </query_items_sql_parameters>
 
 // <query_items_linq>
 // Get LINQ IQueryable object
@@ -90,9 +114,18 @@ var matches = queryable
     .Where(p => p.sale == false)
     .Where(p => p.quantity > 10);
 
-// Iterate over query results
-foreach (Product item in matches)
+// Convert to feed iterator
+using FeedIterator<Product> linqFeed = queryable.ToFeedIterator();
+
+// Iterate query result pages
+while (linqFeed.HasMoreResults)
 {
-    Console.WriteLine($"Matched item:\t{item.name}");
+    FeedResponse<Product> response = await linqFeed.ReadNextAsync();
+
+    // Iterate query results
+    foreach (Product item in response)
+    {
+        Console.WriteLine($"Matched item:\t{item.name}");
+    }
 }
 // </query_items_linq>
