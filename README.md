@@ -1,4 +1,4 @@
-# Quickstart: Azure Cosmos DB client library v3 for .NET
+# Azure Cosmos DB SQL API client library v3 samples for .NET
 
 (short, 1-3 sentenced, description of the project)
 
